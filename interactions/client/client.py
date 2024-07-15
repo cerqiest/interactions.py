@@ -264,7 +264,7 @@ class Client(
         total_shards: The total number of shards in use
         shard_id: The zero based int ID of this shard
 
-        debug_scope: Force all application commands to be registered within this scope
+        debug_scopes: Force all application commands to be registered within these scopes
         disable_dm_commands: Should interaction commands be disabled in DMs?
         basic_logging: Utilise basic logging to output library data to console. Do not use in combination with `Client.logger`
         logging_level: The level of logging to use for basic_logging. Do not use in combination with `Client.logger`
@@ -295,7 +295,7 @@ class Client(
         basic_logging: bool = False,
         component_context: Type[BaseContext] = ComponentContext,
         context_menu_context: Type[BaseContext] = ContextMenuContext,
-        debug_scope: Absent["Snowflake_Type"] = MISSING,
+        debug_scopes: Absent["Snowflake_Type"] = MISSING,
         delete_unused_application_cmds: bool = False,
         disable_dm_commands: bool = False,
         enforce_interaction_perms: bool = True,
@@ -343,7 +343,7 @@ class Client(
         """Should unused application commands be deleted?"""
         self.sync_ext: bool = sync_ext
         """Should we sync whenever a extension is (un)loaded"""
-        self.debug_scope = to_snowflake(debug_scope) if debug_scope is not MISSING else MISSING
+        self.debug_scopes = [(to_snowflake(debug_scope) if debug_scope is not MISSING else MISSING) for debug_scope in debug_scopes]
         """Sync global commands as guild for quicker command updates during debug"""
         self.send_command_tracebacks: bool = send_command_tracebacks
         """Should the traceback of command errors be sent in reply to the command invocation"""
@@ -1362,8 +1362,8 @@ class Client(
             command InteractionCommand: The command to add
 
         """
-        if self.debug_scope:
-            command.scopes = [self.debug_scope]
+        if self.debug_scopes:
+            command.scopes = self.debug_scopes
 
         if self.disable_dm_commands:
             command.dm_permission = False
